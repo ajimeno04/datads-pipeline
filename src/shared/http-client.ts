@@ -51,7 +51,7 @@ export class ResilienceHttpClient {
         // Permanent error: do not retry
         if (response.status >= 400 && response.status < 500) {
           throw new PermanentError(
-            `HTTP ${response.status} en ${url}`,
+            `HTTP ${response.status} at ${url}`,
             response.status
           );
         }
@@ -59,7 +59,7 @@ export class ResilienceHttpClient {
         // Transient error: retry with backoff
         if (response.status >= 500) {
           throw new TransientError(
-            `HTTP ${response.status} en ${url}`,
+            `HTTP ${response.status} at ${url}`,
             response.status
           );
         }
