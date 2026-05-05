@@ -1,0 +1,16 @@
+
+> datads-pipeline@1.0.0 fetch
+> tsx src/main.ts fetch
+
+[2026-05-05T09:02:09.623Z] INFO  Starting ingestion { range: { from: '2026-04-05', to: '2026-05-05' } }
+[2026-05-05T09:02:09.905Z] INFO  Ingestion progreso { platform: 'facebook', pagina: 1, registrosEnPagina: 30 }
+[2026-05-05T09:02:11.272Z] INFO  Ingestion progreso { platform: 'facebook', pagina: 2, registrosEnPagina: 30 }
+[2026-05-05T09:02:11.327Z] INFO  Ingestion progreso { platform: 'facebook', pagina: 3, registrosEnPagina: 30 }
+[2026-05-05T09:02:11.327Z] INFO  Ingestion completada { platform: 'facebook', saved: 90, pages: 3 }
+[2026-05-05T09:02:11.384Z] INFO  Ingestion progreso { platform: 'google', pagina: 1, registrosEnPagina: 30 }
+[2026-05-05T09:02:11.385Z] INFO  Ingestion completada { platform: 'google', saved: 30, pages: 1 }
+[2026-05-05T09:02:11.441Z] INFO  Ingestion progreso { platform: 'tiktok', pagina: 1, registrosEnPagina: 25 }
+[2026-05-05T09:02:11.501Z] INFO  Ingestion progreso { platform: 'tiktok', pagina: 2, registrosEnPagina: 5 }
+[2026-05-05T09:02:11.502Z] INFO  Ingestion completada { platform: 'tiktok', saved: 30, pages: 2 }
+[2026-05-05T09:02:11.503Z] INFO  Ingestion completed { totalRecords: 300 }
+
