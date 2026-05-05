@@ -12,6 +12,11 @@ function requireEnv(key: string): string {
 }
 
 export const config = {
+  api: {
+    baseUrl:
+      process.env['API_BASE_URL'] ??
+      'https://datads-mock-ad-apis.happygrass-47d99234.germanywestcentral.azurecontainerapps.io',
+  },
   facebook: {
     apiKey: requireEnv('FACEBOOK_API_KEY'),
   },
