@@ -148,18 +148,68 @@ See `part_2/sample_output.txt`.
 ## Architecture Decisions
 
 ### Provider Pattern
-[Explain the AsyncGenerator and why interface not abstract class]
+Each ad platform has a different API contract: Facebook uses cursor-based pagination,
+Google uses opaque page tokens, and TikTok uses numeric offset. Instead of handling
+these differences with conditionals in the ingestion logic, each platform implements
+the `PlatformProvider` interface with a single method: `fetchMetrics()`.
+
+This method returns an `AsyncGenerator<AdMetric[]>` — each `yield` delivers one page of
+normalized metrics. The ingestion service consumes pages one at a time without knowing
+anything about pagination mechanics. Adding a new platform means creating a single file
+that implements the interface — zero changes to existing code.
+
+We use an `interface` instead of an `abstract class` because the three platforms share
+a contract (what they deliver) but not an implementation (how they paginate). A template
+method pattern would force artificial hooks to accommodate differences that are better
+expressed as independent implementations.
 
 ### Deduplication
-[Explain the composite key platform + ad_id + date and INSERT OR IGNORE]
+The same data may be fetched multiple times (overlapping date ranges, retried jobs,
+scheduler re-runs). Without deduplication, aggregated metrics would be inflated.
+
+The natural deduplication key is `(platform, ad_id, date)` — one ad on one platform on
+one day produces exactly one set of metrics. This composite key is the PRIMARY KEY in
+SQLite, and inserts use `INSERT OR IGNORE` so duplicates are silently discarded at the
+database level without requiring application-side lookups.
 
 ### Exponential Backoff
-[Explain the formula base × 2^attempt + jitter and why each element exists]
+All three APIs return random HTTP 500 errors 5% of the time. The retry strategy uses
+exponential backoff: `delay = 500ms × 2^attempt + random(0-200ms)`, capped at 30 seconds,
+with a maximum of 4 retries.
+
+The jitter (random component) prevents thundering herd: if multiple providers fail
+simultaneously, they retry at slightly different times instead of hammering the API
+in synchronized bursts.
+
+HTTP 429 (rate limit) is handled separately — the client reads the `Retry-After` header
+and waits the exact duration the server requests.
 
 ### Why SQLite
-[Explain immutability of ad data, zero setup, native INSERT OR IGNORE]
+Ad performance metrics are immutable once written — yesterday's clicks don't change today.
+This means we can pre-compute CTR, CPC, and ROAS during ingestion and never recalculate
+at query time. SQLite provides zero-setup persistence with native `INSERT OR IGNORE`
+support for deduplication. For the exercise scope (3 platforms × 30 days × hundreds of ads),
+SQLite handles both the write and read paths without bottleneck.
 
 ## Testing Strategy
 
-[See the testing section below]
+### Implemented Tests
+
+Unit tests covering three critical areas (run with `npm test`):
+
+1. **Metric calculation** (`createAdMetric`): verifies CTR, CPC, ROAS formulas and
+   division-by-zero edge cases
+2. **Retry logic** (`ResilienceHttpClient`): confirms exponential backoff on 500,
+   immediate failure on 400, and Retry-After compliance on 429
+3. **Deduplication** (`SqliteMetricStore`): confirms INSERT OR IGNORE behavior with
+   same and different composite keys
+
+### What I Would Add With More Time
+
+- **Integration tests**: spin up the Express server, run ingestion against the real
+  mock API, and verify end-to-end that `/api/performance` returns correct aggregates
+- **Provider contract tests**: mock the HTTP client and verify each provider correctly
+  maps platform-specific field names to the canonical model
+- **Edge case coverage**: empty API responses, malformed JSON, network timeouts,
+  concurrent ingestion runs
 

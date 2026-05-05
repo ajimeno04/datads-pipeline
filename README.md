@@ -1,44 +1,49 @@
-# datads-pipeline
+# DatAds Take-Home Exercise
 
-DatAds take-home: pipeline de métricas de anuncios (ingestión mock + API Express + SQLite).
+Ad metrics pipeline: ingests data from 3 advertising platforms (Facebook, Google, TikTok),
+computes CTR/CPC/ROAS, stores in SQLite, and serves via REST API.
 
-## Requisitos
+## Project Structure
 
-- Node.js 20+
+```
+├── part_1/                     # System Design (architecture diagram + decisions)
+├── part_2/                     # Data Polling & Processing (implementation)
+├── part_3/                     # Query API Layer (optional bonus)
+└── datads-pipeline/            # Source code
+    └── src/
+        ├── providers/          # Platform adapters (Facebook, Google, TikTok)
+        ├── services/           # Ingestion pipeline + metrics aggregation
+        ├── storage/            # SQLite repository with dedup
+        ├── api/                # Express routes with validation
+        └── shared/             # HTTP client, types, config
+```
 
-## Instalación
+## Quick Start
 
 ```bash
-cd datads-pipeline
 npm install
+cp .env.example .env
+npm run fetch          # Ingest last 30 days into SQLite
+npm run dev            # Start API server on port 3000
 ```
 
-## Ingestión on-demand
+## API Endpoints
 
-Últimos 30 días hacia `./data.db`:
-
-```bash
-npm run fetch
-```
-
-## Servidor de desarrollo (API en puerto 3000)
-
-```bash
-npm run dev
-```
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/performance` | Aggregated metrics with filters (platform, date_from, date_to, campaign_id) |
+| `GET /api/top-performing` | Top ads by metric (ctr, cpc, roas, clicks, revenue) with limit and sort |
 
 ## Scripts
 
-| Script        | Descripción                          |
-| ------------- | ------------------------------------ |
-| `npm run dev` | `tsx watch src/main.ts`              |
-| `npm run build` | Compila TypeScript a `dist/`      |
-| `npm start`   | Ejecuta `node dist/main.js`          |
-| `npm run fetch` | Ingesta y sale (`tsx src/main.ts fetch`) |
-| `npm test`    | Vitest en modo run                   |
-| `npm run test:watch` | Vitest watch                  |
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Development server with hot reload |
+| `npm run build` | TypeScript compilation |
+| `npm run fetch` | On-demand data ingestion (last 30 days) |
+| `npm test` | Run test suite |
 
-## Endpoints
+## AI Assistance
 
-- `GET /api/performance` — query opcional: `platform`, `date_from`, `date_to`, `campaign_id`
-- `GET /api/top-performing` — query requerido: `metric` (`ctr` \| `cpc` \| `roas` \| `clicks` \| `revenue`); opcional: `order`, `limit`, mismos filtros que performance
+Claude (Anthropic) was used as a design thinking partner to debate architectural
+tradeoffs and draft documentation. All decisions and code are my own.
