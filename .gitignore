@@ -4,12 +4,12 @@ node_modules/
 # Build output
 dist/
 
-# Database files — contienen datos reales, no van al repo
+# Database files — contain real data, do not commit
 *.db
 *.db-shm
 *.db-wal
 
-# Environment variables — NUNCA al repositorio
+# Environment variables — NEVER commit to repository
 .env
 .env.local
 .env.*.local
