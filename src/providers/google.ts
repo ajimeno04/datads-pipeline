@@ -9,9 +9,6 @@ import { config } from '../shared/config.js';
 import { logger } from '../shared/logger.js';
 import type { PlatformProvider } from './types.js';
 
-const MOCK_BASE =
-  'https://datads-mock-ad-apis.happygrass-47d99234.germanywestcentral.azurecontainerapps.io';
-
 type GoogleReportRow = {
   campaignId: string;
   adGroupId: string;
@@ -44,7 +41,7 @@ export class GoogleProvider implements PlatformProvider {
     let pageToken: string | undefined;
 
     for (;;) {
-      const url = new URL(`${MOCK_BASE}/api/reports/campaigns`);
+      const url = new URL(`${config.api.baseUrl}/api/reports/campaigns`);
       url.searchParams.set('start_date', range.from);
       url.searchParams.set('end_date', range.to);
       url.searchParams.set('page_size', '50');

@@ -9,9 +9,6 @@ import { config } from '../shared/config.js';
 import { logger } from '../shared/logger.js';
 import type { PlatformProvider } from './types.js';
 
-const MOCK_BASE =
-  'https://datads-mock-ad-apis.happygrass-47d99234.germanywestcentral.azurecontainerapps.io';
-
 const CAMPAIGN_IDS = ['fb_camp_123', 'fb_camp_456', 'fb_camp_789'] as const;
 
 type FacebookInsightRow = {
@@ -44,7 +41,7 @@ export class FacebookProvider implements PlatformProvider {
 
       for (;;) {
         const url = new URL(
-          `${MOCK_BASE}/api/v1/campaigns/${campaignId}/insights`
+          `${config.api.baseUrl}/api/v1/campaigns/${campaignId}/insights`
         );
         url.searchParams.set('since', range.from);
         url.searchParams.set('until', range.to);

@@ -9,9 +9,6 @@ import { config } from '../shared/config.js';
 import { logger } from '../shared/logger.js';
 import type { PlatformProvider } from './types.js';
 
-const MOCK_BASE =
-  'https://datads-mock-ad-apis.happygrass-47d99234.germanywestcentral.azurecontainerapps.io';
-
 type TikTokPerformanceRow = {
   campaign: {
     id: string;
@@ -45,7 +42,7 @@ export class TikTokProvider implements PlatformProvider {
     let offset = 0;
 
     for (;;) {
-      const url = new URL(`${MOCK_BASE}/v1/ad/performance`);
+      const url = new URL(`${config.api.baseUrl}/v1/ad/performance`);
       url.searchParams.set('date_from', range.from);
       url.searchParams.set('date_to', range.to);
       url.searchParams.set('offset', String(offset));
