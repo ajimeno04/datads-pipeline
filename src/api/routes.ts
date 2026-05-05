@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from 'express';
+import type { Express, NextFunction, Request, Response } from 'express';
 import { getPerformance, getTopPerforming } from '../services/metrics.js';
 import type { MetricStore, PerformanceQuery, TopPerformingQuery } from '../storage/types.js';
 
@@ -134,7 +134,8 @@ export function registerRoutes(app: Express, store: MetricStore): void {
     res.status(404).json({ error: 'Not Found' });
   });
 
-  app.use((_err: unknown, _req: Request, res: Response, _next: unknown) => {
+  app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    void err;
     res.status(500).json({ error: 'Internal Server Error' });
   });
 }
